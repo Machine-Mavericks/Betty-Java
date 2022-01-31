@@ -4,11 +4,10 @@ package frc.swerverobot.drivers;
 //import edu.wpi.first.wpilibj.SPI;
 import org.frcteam2910.common.drivers.Gyroscope;
 import org.frcteam2910.common.math.Rotation2;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+
 import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 
 public final class T265 extends Gyroscope {
 //    private final AHRS navX;

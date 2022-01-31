@@ -15,7 +15,7 @@ public class DriveCommand extends CommandBase {
     private final DoubleSupplier strafe;
     private final DoubleSupplier rotation;
 
-    // create a pid controller for robot rotation
+    // create a pid controller for rlearobot rotation
     private PidController rotationController = new PidController(new PidConstants(0.5, 0.0, 0.02));
 
     public DriveCommand(DrivetrainSubsystem drivetrain,
