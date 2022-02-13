@@ -28,7 +28,8 @@ public class RobotContainer {
                 drivetrain,
                 () -> -controller.getLeftXAxis().get(true)*0.75,
                 () -> controller.getLeftYAxis().get(true)*0.75,
-                () -> controller.getRightXAxis().get(true)*0.5
+                () -> controller.getRightXAxis().get(true)*0.5,
+                () -> controller.getRightBumperButton().get()
         ));
 
 

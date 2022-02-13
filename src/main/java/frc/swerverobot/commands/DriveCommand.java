@@ -7,6 +7,7 @@ import org.frcteam2910.common.math.Vector2;
 import org.frcteam2910.common.control.PidConstants;
 import org.frcteam2910.common.control.PidController;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 public class DriveCommand extends CommandBase {
@@ -14,6 +15,7 @@ public class DriveCommand extends CommandBase {
     private final DoubleSupplier forward;
     private final DoubleSupplier strafe;
     private final DoubleSupplier rotation;
+    private final BooleanSupplier fieldRelative;
 
     // create a pid controller for rlearobot rotation
     private PidController rotationController = new PidController(new PidConstants(0.5, 0.0, 0.02));
@@ -21,11 +23,13 @@ public class DriveCommand extends CommandBase {
     public DriveCommand(DrivetrainSubsystem drivetrain,
                         DoubleSupplier forward,
                         DoubleSupplier strafe,
-                        DoubleSupplier rotation) {
+                        DoubleSupplier rotation,
+                        BooleanSupplier fieldRelative) {
         this.drivetrain = drivetrain;
         this.forward = forward;
         this.strafe = strafe;
         this.rotation = rotation;
+        this.fieldRelative = fieldRelative;
 
         rotationController.setInputRange(0.0, 2*Math.PI);
         rotationController.setContinuous(true);
@@ -43,32 +47,14 @@ public class DriveCommand extends CommandBase {
     @Override
     public void execute() {
 
-        // if the driver isn't rotating the robot, use pid to keep robot orientation constant (rotation = 0)
-        if (rotation.getAsDouble() == 0) {
-            double rotationOutput = 0;//rotationController.calculate(drivetrain.getPose().rotation.toRadians(), 0.02);
-
-        // drive command, change values here to change robot speed/field oriented
-            drivetrain.drive(
-                    new Vector2(
-                            forward.getAsDouble(),
-                            strafe.getAsDouble()
-                    ),
-                    rotationOutput,
-                    true
-            );
-        }
-
-        // if the driver is rotating the robot, just get the rotation value and plug it into the .drive()
-        else{
-            drivetrain.drive(
-                    new Vector2(
-                            forward.getAsDouble(),
-                            strafe.getAsDouble()
-                    ),
-                    rotation.getAsDouble(),
-                    true
-            );
-        }
+        drivetrain.drive(
+                new Vector2(
+                        forward.getAsDouble(),
+                        strafe.getAsDouble()
+                ),
+                rotation.getAsDouble(),
+                !fieldRelative.getAsBoolean()
+        );
 
     }
 
