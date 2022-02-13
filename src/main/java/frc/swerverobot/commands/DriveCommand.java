@@ -54,7 +54,7 @@ public class DriveCommand extends CommandBase {
                             strafe.getAsDouble()
                     ),
                     rotationOutput,
-                    true
+                    false
             );
         }
 

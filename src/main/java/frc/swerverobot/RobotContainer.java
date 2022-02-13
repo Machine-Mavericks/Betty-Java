@@ -25,9 +25,9 @@ public class RobotContainer {
         // set the drivetrain's default command to the driver's controller values
         CommandScheduler.getInstance().setDefaultCommand(drivetrain, new DriveCommand(
                 drivetrain,
-                () -> controller.getLeftXAxis().get(true),
-                () -> -controller.getLeftYAxis().get(true),
-                () -> controller.getRightXAxis().get(true)
+                () -> -controller.getLeftXAxis().get(true)*0.75,
+                () -> controller.getLeftYAxis().get(true)*0.75,
+                () -> controller.getRightXAxis().get(true)*0.5
         ));
 
 

@@ -89,21 +89,16 @@ public class Mk2SwerveModuleBuilder {
      *                the true module angle.
      * @return The builder.
      */
-    public Mk2SwerveModuleBuilder angleEncoder(CANSparkMax motor, double offset) {
+    public Mk2SwerveModuleBuilder angleEncoder(AnalogInput encoder, double offset) {
 
-        CANAnalog enc = motor.getAnalog(AnalogMode.kAbsolute);
-        if (Double.isNaN(offset))
-            offset = -(1.0 - enc.getPosition() / 3.3) * 2.0 * Math.PI;
-
-        final double off = offset;
         angleSupplier = () -> {
-            double angle = (1.0 - enc.getPosition() / 3.3) * 2.0 * Math.PI;
-            angle += off;
+            double angle = (1.0 - encoder.getVoltage() / RobotController.getVoltage5V()) * 2.0 * Math.PI;
+            angle += offset;
             angle %= 2.0 * Math.PI;
             if (angle < 0.0) {
                 angle += 2.0 * Math.PI;
             }
-    
+
             return angle;
         };
 
@@ -122,13 +117,13 @@ public class Mk2SwerveModuleBuilder {
      *              in radians.
      * @return The builder.
      */
-    public Mk2SwerveModuleBuilder angleMotor(CANSparkMax motor, double offset) {
-        return angleMotor(motor, DEFAULT_CAN_SPARK_MAX_ANGLE_CONSTANTS, DEFAULT_ANGLE_REDUCTION, offset);
+    public Mk2SwerveModuleBuilder angleMotor(CANSparkMax motor) {
+        return angleMotor(motor, DEFAULT_CAN_SPARK_MAX_ANGLE_CONSTANTS, DEFAULT_ANGLE_REDUCTION);
     }
 
-    public Mk2SwerveModuleBuilder angleMotor(CANSparkMax motor, MotorType motorType, double offset) {
+    public Mk2SwerveModuleBuilder angleMotor(CANSparkMax motor, MotorType motorType) {
         if (motorType == MotorType.NEO) {
-            return angleMotor(motor, DEFAULT_CAN_SPARK_MAX_ANGLE_CONSTANTS, DEFAULT_ANGLE_REDUCTION, offset);
+            return angleMotor(motor, DEFAULT_CAN_SPARK_MAX_ANGLE_CONSTANTS, DEFAULT_ANGLE_REDUCTION);
         }
 
         return angleMotor((SpeedController) motor, motorType);
@@ -147,21 +142,17 @@ public class Mk2SwerveModuleBuilder {
      *                  For example, an 18:1 ratio should be specified by {@code 18.0 / 1.0}.
      * @return The builder.
      */
-    public Mk2SwerveModuleBuilder angleMotor(CANSparkMax motor, PidConstants constants, double reduction, double offset) {
+    public Mk2SwerveModuleBuilder angleMotor(CANSparkMax motor, PidConstants constants, double reduction) {
         CANEncoder encoder = motor.getEncoder();
         encoder.setPositionConversionFactor(2.0 * Math.PI / reduction);
 
-        CANAnalog enc = motor.getAnalog(AnalogMode.kAbsolute);
-        
         CANPIDController controller = motor.getPIDController();
 
         controller.setP(constants.p);
         controller.setI(constants.i);
-        controller.setD(constants.d);
-
+        controller.setD(constants.i);
 
         targetAngleConsumer = targetAngle -> {
-
             double currentAngle = encoder.getPosition();
             // Calculate the current angle in the range [0, 2pi)
             double currentAngleMod = currentAngle % (2.0 * Math.PI);
@@ -176,34 +167,10 @@ public class Mk2SwerveModuleBuilder {
             } else if (targetAngle - currentAngleMod < -Math.PI) {
                 newTarget += 2.0 * Math.PI;
             }
-            
-//            if (System.currentTimeMillis() > tstamp) { 
-//                System.out.println("Device ID: " + motor.getDeviceId() + "\t angle:" + currentAngle + "\n");
-//                tstamp = System.currentTimeMillis() + 500; 
-//            }
 
             controller.setReference(newTarget, ControlType.kPosition);
         };
         initializeAngleCallback = encoder::setPosition;
-
-        if (Double.isNaN(offset))
-            offset = -(1.0 - enc.getPosition() / 3.3) * 2.0 * Math.PI;
-
-        final double off = offset;
-        angleSupplier = () -> {
-            double angle = (1.0 - enc.getPosition() / 3.3) * 2.0 * Math.PI;
-            SmartDashboard.putNumber(String.format("%d: encoder raw", motor.getDeviceId()), angle*180/Math.PI);
-            angle += off;
-            angle %= 2.0 * Math.PI;
-            if (angle < 0.0) {
-                angle += 2.0 * Math.PI;
-            }
-
-            SmartDashboard.putNumber(String.format("%d: encoder", motor.getDeviceId()), angle*180/Math.PI);
-
-            return angle;
-        };
-
 
         return this;
     }

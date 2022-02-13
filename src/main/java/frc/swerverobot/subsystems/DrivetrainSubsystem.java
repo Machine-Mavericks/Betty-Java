@@ -1,17 +1,6 @@
 package frc.swerverobot.subsystems;
 
-import static frc.swerverobot.RobotMap.DRIVETRAIN_BACK_LEFT_MODULE_ANGLE_MOTOR;
-import static frc.swerverobot.RobotMap.DRIVETRAIN_BACK_LEFT_MODULE_ANGLE_OFFSET;
-import static frc.swerverobot.RobotMap.DRIVETRAIN_BACK_LEFT_MODULE_DRIVE_MOTOR;
-import static frc.swerverobot.RobotMap.DRIVETRAIN_BACK_RIGHT_MODULE_ANGLE_MOTOR;
-import static frc.swerverobot.RobotMap.DRIVETRAIN_BACK_RIGHT_MODULE_ANGLE_OFFSET;
-import static frc.swerverobot.RobotMap.DRIVETRAIN_BACK_RIGHT_MODULE_DRIVE_MOTOR;
-import static frc.swerverobot.RobotMap.DRIVETRAIN_FRONT_LEFT_MODULE_ANGLE_MOTOR;
-import static frc.swerverobot.RobotMap.DRIVETRAIN_FRONT_LEFT_MODULE_ANGLE_OFFSET;
-import static frc.swerverobot.RobotMap.DRIVETRAIN_FRONT_LEFT_MODULE_DRIVE_MOTOR;
-import static frc.swerverobot.RobotMap.DRIVETRAIN_FRONT_RIGHT_MODULE_ANGLE_MOTOR;
-import static frc.swerverobot.RobotMap.DRIVETRAIN_FRONT_RIGHT_MODULE_ANGLE_OFFSET;
-import static frc.swerverobot.RobotMap.DRIVETRAIN_FRONT_RIGHT_MODULE_DRIVE_MOTOR;
+import static frc.swerverobot.RobotMap.*;
 
 import com.google.errorprone.annotations.concurrent.GuardedBy;
 import com.revrobotics.CANSparkMax;
@@ -31,6 +20,7 @@ import org.frcteam2910.common.robot.drivers.Mk2SwerveModuleBuilder;
 import org.frcteam2910.common.util.HolonomicDriveSignal;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
@@ -55,49 +45,43 @@ public class DrivetrainSubsystem extends SubsystemBase implements UpdateManager.
             // check org/frcteam2910/common/robot/drivers/Mk2SwerveModuleBuilder
             // to see the initialization arguments
     private final SwerveModule frontLeftModule =
-            new Mk2SwerveModuleBuilder(new Vector2(TRACKWIDTH / 2.0, -WHEELBASE / 2.0))
+                new Mk2SwerveModuleBuilder(new Vector2(TRACKWIDTH / 2.0, -WHEELBASE / 2.0))
+                .angleEncoder(new AnalogInput(DRIVETRAIN_FRONT_LEFT_MODULE_ANGLE_ENCODER), DRIVETRAIN_FRONT_LEFT_MODULE_ANGLE_OFFSET)
                     .angleMotor(
                             new CANSparkMax(DRIVETRAIN_FRONT_LEFT_MODULE_ANGLE_MOTOR, CANSparkMaxLowLevel.MotorType.kBrushless),
-                            rotation1, 18.0 / 1.0, DRIVETRAIN_FRONT_LEFT_MODULE_ANGLE_OFFSET) 
-                //     .angleEncoder(
-                //            .angleMotor.getAnalog(),
-                //               DRIVETRAIN_FRONT_RIGHT_MODULE_ANGLE_OFFSET)
+                            rotation1, 18.0 / 1.0) 
                     .driveMotor(
                             new CANSparkMax(DRIVETRAIN_FRONT_LEFT_MODULE_DRIVE_MOTOR, CANSparkMaxLowLevel.MotorType.kBrushless),
                             Mk2SwerveModuleBuilder.MotorType.NEO)
                     .build();
     private final SwerveModule frontRightModule =
             new Mk2SwerveModuleBuilder(new Vector2(TRACKWIDTH / 2.0, -WHEELBASE / 2.0))
+                    .angleEncoder(new AnalogInput(DRIVETRAIN_FRONT_RIGHT_MODULE_ANGLE_ENCODER), DRIVETRAIN_FRONT_RIGHT_MODULE_ANGLE_OFFSET)
                     .angleMotor(
                             new CANSparkMax(DRIVETRAIN_FRONT_RIGHT_MODULE_ANGLE_MOTOR, CANSparkMaxLowLevel.MotorType.kBrushless),
-                            rotation2, 18.0/1.0, DRIVETRAIN_FRONT_RIGHT_MODULE_ANGLE_OFFSET)    
-//                    .angleEncoder(
- //                           NULL, /*new AnalogInput(DRIVETRAIN_FRONT_LEFT_MODULE_ANGLE_ENCODER),*/
-  //                          DRIVETRAIN_FRONT_RIGHT_MODULE_ANGLE_OFFSET)
+                            rotation2, 18.0/1.0) 
                     .driveMotor(
                             new CANSparkMax(DRIVETRAIN_FRONT_RIGHT_MODULE_DRIVE_MOTOR, CANSparkMaxLowLevel.MotorType.kBrushless),
                             Mk2SwerveModuleBuilder.MotorType.NEO)
                     .build();
     private final SwerveModule backLeftModule =
             new Mk2SwerveModuleBuilder(new Vector2(-TRACKWIDTH / 2.0, -WHEELBASE / 2.0))
-//                    .angleEncoder(
- //                           new AnalogInput(DRIVETRAIN_BACK_LEFT_MODULE_ANGLE_ENCODER),
-  //                          DRIVETRAIN_BACK_LEFT_MODULE_ANGLE_OFFSET)
                     .angleMotor(
                             new CANSparkMax(DRIVETRAIN_BACK_LEFT_MODULE_ANGLE_MOTOR, CANSparkMaxLowLevel.MotorType.kBrushless),
-                            rotation3, 18.0/1.0, DRIVETRAIN_BACK_LEFT_MODULE_ANGLE_OFFSET)
+                            rotation3, 18.0/1.0)
+                    .angleEncoder(new AnalogInput(DRIVETRAIN_BACK_LEFT_MODULE_ANGLE_ENCODER), DRIVETRAIN_BACK_LEFT_MODULE_ANGLE_OFFSET)
                     .driveMotor(
                             new CANSparkMax(DRIVETRAIN_BACK_LEFT_MODULE_DRIVE_MOTOR, CANSparkMaxLowLevel.MotorType.kBrushless),
                             Mk2SwerveModuleBuilder.MotorType.NEO)
                     .build();
     private final SwerveModule backRightModule =
             new Mk2SwerveModuleBuilder(new Vector2(-TRACKWIDTH / 2.0, WHEELBASE / 2.0))
-//                    .angleEncoder(
- //                           new AnalogInput(DRIVETRAIN_BACK_RIGHT_MODULE_ANGLE_ENCODER),
-  //                          DRIVETRAIN_BACK_RIGHT_MODULE_ANGLE_OFFSET)
+                   .angleEncoder(
+                           new AnalogInput(DRIVETRAIN_BACK_RIGHT_MODULE_ANGLE_ENCODER),
+                           DRIVETRAIN_BACK_RIGHT_MODULE_ANGLE_OFFSET)
                     .angleMotor(
                             new CANSparkMax(DRIVETRAIN_BACK_RIGHT_MODULE_ANGLE_MOTOR, CANSparkMaxLowLevel.MotorType.kBrushless),
-                            rotation4, 18.0/1.0, DRIVETRAIN_BACK_RIGHT_MODULE_ANGLE_OFFSET)
+                            rotation4, 18.0/1.0)
                     .driveMotor(
                             new CANSparkMax(DRIVETRAIN_BACK_RIGHT_MODULE_DRIVE_MOTOR, CANSparkMaxLowLevel.MotorType.kBrushless),
                             Mk2SwerveModuleBuilder.MotorType.NEO)
