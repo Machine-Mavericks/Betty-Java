@@ -45,7 +45,7 @@ public class DriveCommand extends CommandBase {
 
         // if the driver isn't rotating the robot, use pid to keep robot orientation constant (rotation = 0)
         if (rotation.getAsDouble() == 0) {
-            double rotationOutput = rotationController.calculate(drivetrain.getPose().rotation.toRadians(), 0.02);
+            double rotationOutput = 0;//rotationController.calculate(drivetrain.getPose().rotation.toRadians(), 0.02);
 
         // drive command, change values here to change robot speed/field oriented
             drivetrain.drive(
@@ -54,7 +54,7 @@ public class DriveCommand extends CommandBase {
                             strafe.getAsDouble()
                     ),
                     rotationOutput,
-                    false
+                    true
             );
         }
 

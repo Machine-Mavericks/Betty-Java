@@ -27,11 +27,12 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.swerverobot.drivers.NavX;
 
 public class DrivetrainSubsystem extends SubsystemBase implements UpdateManager.Updatable {
     // define the trackwidth (short side in our case) and wheelbase (long side in our case) ratio of the robot
-    private static final double TRACKWIDTH = 1.0;
-    private static final double WHEELBASE = 1.0;
+    private static final double TRACKWIDTH = 0.49;
+    private static final double WHEELBASE = 0.49;
 
     // define the pid constants for each rotation motor
     private static final PidConstants rotation1 = new PidConstants(.5, 0.0, 0.0001);
@@ -104,7 +105,7 @@ public class DrivetrainSubsystem extends SubsystemBase implements UpdateManager.
 
 //    public final ADIS16470_IMU adisGyro = new ADIS16470_IMU();
 
-    //private final NavX navX = new NavX(SPI.Port.kMXP);
+    public final NavX navX = new NavX();
 //    private NetworkTableEntry t265Pitch;
         private double pitchZero;
         private NetworkTableEntry t265Pitch;
@@ -184,8 +185,7 @@ public class DrivetrainSubsystem extends SubsystemBase implements UpdateManager.
 
     public void resetGyroAngle(Rotation2 angle) {
         synchronized (sensorLock) {
-                pitchZero = t265Pitch.getDouble(1.0); // SmartDashboard.getNumber("T265/Pitch", 1.0);
-
+            navX.calibrate();
 //                adisGyro.calibrate();
         }
     }
@@ -216,17 +216,7 @@ public class DrivetrainSubsystem extends SubsystemBase implements UpdateManager.
         // updates robot angle based on gyro at intervals of length dt
         Rotation2 angle;
         synchronized (sensorLock) {
-                double rangle = t265Pitch.getDouble(Double.NaN); // /*SmartDashboard.getNumber("Pitch", 1.0)
-                if (Double.isNaN(rangle)) { 
-                        rangle = pitchZero;
-                }
-
-                angle = Rotation2.fromRadians(-(rangle - pitchZero)); // subtract from the robot's zero angle
-
-//              angle = Rotation2.fromDegrees(-adisGyro.getAngle());
-
-            //angle = Rotation2.fromDegrees(-lil_navX.getAngle());
-            //angle = navX.getAngle();
+            angle = Rotation2.fromRadians(navX.getAxis(NavX.Axis.YAW));
         }
 
         RigidTransform2 pose = odometry.update(angle, dt, moduleVelocities); // set the "pose" to the robot's actual pose
